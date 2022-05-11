@@ -1,9 +1,12 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-check_items=$(gh pr checks || true)
+if ! which fzf >/dev/null; then
+    echo "error: install \`fzf\` to use this command"
+    exit 1
+fi
 
-# if not install fzf, echo install and exit with 0
+check_items=$(gh pr checks || true)
 
 if [[ -z "$check_items" ]]; then
     exit 0
