@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+check_items=$(gh pr checks || true)
+
+# if not install fzf, echo install and exit with 0
+
+if [[ -z "$check_items" ]]; then
+    exit 0
+fi
+
+num_of_checks=$(echo "$check_items" | wc -l)
+
+if [[ $num_of_checks -eq 0 ]]; then
+    echo "No checks found"
+    exit 0
+fi
+
+if [[ $num_of_checks -eq 1 ]]; then
+    url=$(printf "$check_items" | awk '{print $NF}')
+else
+    url=$(printf "$check_items" | fzf | awk '{print $NF}')
+fi
+
+if which xdg-open >/dev/null; then
+    xdg-open "$url"
+elif which open >/dev/null; then
+    open "$url"
+else
+    echo "Could not find an open command."
+    echo "Please open the following url in your browser:"
+    echo "$url"
+fi
